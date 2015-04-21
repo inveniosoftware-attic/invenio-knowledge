@@ -28,7 +28,6 @@ from invenio.modules.collections.models import Collection
 from invenio.utils.text import slugify
 
 from sqlalchemy.event import listens_for
-
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 

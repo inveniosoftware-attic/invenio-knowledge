@@ -2,6 +2,9 @@
  Invenio Knowledge
 ===================
 
+.. image:: https://img.shields.io/coveralls/coagulant/coveralls-python.svg
+        :target: https://coveralls.io/r/inveniosoftware/invenio-knowledge
+
 .. image:: https://travis-ci.org/inveniosoftware/invenio-knowledge.png?branch=master
         :target: https://travis-ci.org/inveniosoftware/invenio-knowledge
 

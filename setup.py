@@ -39,6 +39,8 @@ test_requirements = [
     'pytest-cov',
     'pytest-pep8',
     'coverage',
+    'coveralls',
+    'flask_testing',
 ]
 
 
@@ -104,6 +106,7 @@ setup(
             'Sphinx',
             'sphinx_rtd_theme'
         ],
+        'test': test_requirements
     },
     classifiers=[
         'Environment :: Web Environment',
