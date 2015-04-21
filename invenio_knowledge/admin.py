@@ -41,8 +41,8 @@ def KnwKBRVAL_id_knwKB_formatter(view, context, model, name):
 def Knowledge_kbtype_formatter(view, context, model, name):
     """Formatter for the kbtype: return the Knowledge name instead."""
     value = model.kbtype
-    return next((key for key, val in KnwKB.KNWKB_TYPES.items() if val == value),
-                None)
+    return next((key for key, val in KnwKB.KNWKB_TYPES.items()
+                 if val == value), None)
 
 
 class KnwKBRVALAdmin(ModelView):

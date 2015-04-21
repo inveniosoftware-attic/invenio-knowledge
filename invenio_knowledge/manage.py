@@ -50,14 +50,16 @@ def load(name, filepath, separator="---"):
 
         $ inveniomanage knowledge load mykb /path/to/file.kb
 
-    The file is expected to have a mapping with values: ``foo<seperator>bar`` (per line)
+    The file is expected to have a mapping with values: ``foo<seperator>bar``
+    (per line).
 
     ``<separator>`` is by default set to **---**, but can be overridden with
     ``-s someseperator`` or ``--sep someseperator``.
     """
-    current_app.logger.info(">>> Going to load knowledge base {0} into '{1}'...".format(
-        filepath, name
-    ))
+    current_app.logger.info(
+        ">>> Going to load knowledge base {0} into '{1}'...".format(
+            filepath, name
+        ))
     if not os.path.isfile(filepath):
         current_app.logger.error(
             "Path to non-existing file\n",
