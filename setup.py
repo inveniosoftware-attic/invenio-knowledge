@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation,
 # Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Invenio module for record tagging by authenticated users."""
+"""Invenio module for knowledge base management."""
 
 import os
 import sys
@@ -85,7 +85,7 @@ with open(os.path.join("invenio_knowledge", "version.py"), "rt") as fp:
     version = g["__version__"]
 
 setup(
-    name='Invenio Knowledge',
+    name='invenio-knowledge',
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,

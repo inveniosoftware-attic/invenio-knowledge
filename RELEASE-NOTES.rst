@@ -7,7 +7,7 @@ Invenio Knowledge v0.1.0 was released on TBD.
 About
 -----
 
-Invenio module that adds support for record tagging by authenticated users.
+Invenio module for knowledge base management.
 
 What's new
 ----------
