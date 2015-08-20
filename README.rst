@@ -1,58 +1,49 @@
+..
+    This file is part of Invenio.
+    Copyright (C) 2015 CERN.
+
+    Invenio is free software; you can redistribute it
+    and/or modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio; if not, write to the
+    Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+    MA 02111-1307, USA.
+
+    In applying this license, CERN does not
+    waive the privileges and immunities granted to it by virtue of its status
+    as an Intergovernmental Organization or submit itself to any jurisdiction.
+
 ===================
- Invenio Knowledge
+ Invenio-Knowledge
 ===================
 
-.. image:: https://img.shields.io/coveralls/coagulant/coveralls-python.svg
-        :target: https://coveralls.io/r/inveniosoftware/invenio-knowledge
-
-.. image:: https://travis-ci.org/inveniosoftware/invenio-knowledge.png?branch=master
+.. image:: https://img.shields.io/travis/inveniosoftware/invenio-knowledge.svg
         :target: https://travis-ci.org/inveniosoftware/invenio-knowledge
 
-.. image:: https://pypip.in/d/invenio-knowledge/badge.png
+.. image:: https://img.shields.io/coveralls/inveniosoftware/invenio-knowledge.svg
+        :target: https://coveralls.io/r/inveniosoftware/invenio-knowledge
+
+.. image:: https://img.shields.io/github/tag/inveniosoftware/invenio-knowledge.svg
+        :target: https://github.com/inveniosoftware/invenio-knowledge/releases
+
+.. image:: https://img.shields.io/pypi/dm/invenio-knowledge.svg
         :target: https://pypi.python.org/pypi/invenio-knowledge
 
+.. image:: https://img.shields.io/github/license/inveniosoftware/invenio-knowledge.svg
+        :target: https://github.com/inveniosoftware/invenio-knowledge/blob/master/LICENSE
 
-Invenio module that adds support for knowledge base storage.
 
-The Knowledge module provides tools for cataloguers to manage "knowledge bases",
-"authority files" and "ontologies".
-Knowledge contains information for standardisation and record quality checking.
+Invenio module for knowledge base management.
 
-Typical examples:
-
-1. Field author institute is often written as "Odd University Strange Research
-   Lab" though it is officially (canonically) known as "StrangeLab of the Odd
-   University".
-2. If field "author email" contains "@strange.odd.edu" the author institute
-   should be "StrangeLab of the Odd University".
-3. Ontology files contain information about the hierarchy of key words.
-
-There are three four types of knowledge bases:
-
-1. "map_from" "map_to": this is the typical case, the knowledge base is
-   essentially a list of left side - right side pairs.
-   Like "Genf" -> "Geneva" or "Odd University Strange Research Lab" ->
-   "StrangeLab of the Odd University".
-   The abbreviation for this type is kbr (for reference).
-2. "authority only": this kind of knowledge base only lists the canonical
-   values.
-   Example: "Geneva", "StrangeLab of the Odd University".
-   It is a special case of "map_from" "map_to", where left side and right side
-   are identical.
-   The abbreviation for this type is kba (for authority).
-3. "dynamic": these knowledge bases are "authority only" knowledge bases that
-   are built dynamically using a search expression.
-   Example: if the author institute is stored in field 100__u, a dynamic
-   knowledge base that uses this field, returns all the values of 100__u.
-   The abbreviation for this type is kbd (for dynamic).
-4. "taxonomy" (or ontology): an RDF (resource description framework) file can
-   be uploaded into invenio and used as a knowledge base.
+*This is an experimental development preview release.*
 
 * Free software: GPLv2 license
 * Documentation: https://invenio-knowledge.readthedocs.org.
-
-Features
---------
-
-- dynamic knowledge bases
-- REST API

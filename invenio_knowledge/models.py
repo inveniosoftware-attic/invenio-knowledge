@@ -24,11 +24,13 @@ import os
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.collections.models import Collection
+from invenio_collections.models import Collection
 from invenio.utils.text import slugify
 
+from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.schema import Index
 
 
 class KnwKB(db.Model):
@@ -127,11 +129,11 @@ class KnwKB(db.Model):
                       "E.g. [kval.to_dict() for kval in "
                       "KnwKBRVAL.query_kb_mappings(kb_id).all()]")
         if searchtype == 's' and searchkey:
-            searchkey = '%'+searchkey+'%'
+            searchkey = '%' + searchkey + '%'
         if searchtype == 's' and searchvalue:
-            searchvalue = '%'+searchvalue+'%'
+            searchvalue = '%' + searchvalue + '%'
         if searchtype == 'sw' and searchvalue:  # startswith
-            searchvalue = searchvalue+'%'
+            searchvalue = searchvalue + '%'
         if not searchvalue:
             searchvalue = '%'
         if not searchkey:
@@ -160,11 +162,11 @@ class KnwKB(db.Model):
                       "KnwKBRVAL.query_kb_mappings(kb_id).all()]")
         # prepare filters
         if searchtype == 's':
-            searchkey = '%'+searchkey+'%'
+            searchkey = '%' + searchkey + '%'
         if searchtype == 's' and searchvalue:
-            searchvalue = '%'+searchvalue+'%'
+            searchvalue = '%' + searchvalue + '%'
         if searchtype == 'sw' and searchvalue:  # startswith
-            searchvalue = searchvalue+'%'
+            searchvalue = searchvalue + '%'
         if not searchvalue:
             searchvalue = '%'
         # execute query
@@ -280,10 +282,18 @@ class KnwKBRVAL(db.Model):
     __tablename__ = 'knwKBRVAL'
     m_key = db.Column(db.String(255), nullable=False, primary_key=True,
                       index=True)
-    m_value = db.Column(db.Text(30), nullable=False, index=True)
-    id_knwKB = db.Column(db.MediumInteger(8), db.ForeignKey(KnwKB.id),
-                         nullable=False, server_default='0',
-                         primary_key=True)
+    m_value = db.Column(
+        db.Text().with_variant(mysql.TEXT(30), 'mysql'),
+        nullable=False)
+    id_knwKB = db.Column(
+        db.MediumInteger(
+            8,
+            unsigned=True),
+        db.ForeignKey(
+            KnwKB.id),
+        nullable=False,
+        server_default='0',
+        primary_key=True)
     kb = db.relationship(
         KnwKB,
         backref=db.backref(
@@ -311,16 +321,16 @@ class KnwKBRVAL(db.Model):
         # filter
         if len(key) > 0:
             if match_type == "s":
-                key = "%"+key+"%"
+                key = "%" + key + "%"
             elif match_type == "sw":
-                key = key+"%"
+                key = key + "%"
         else:
             key = '%'
         if len(value) > 0:
             if match_type == "s":
-                value = "%"+value+"%"
+                value = "%" + value + "%"
             elif match_type == "sw":
-                value = value+"%"
+                value = value + "%"
         else:
             value = '%'
         query = query.filter(
@@ -341,5 +351,8 @@ class KnwKBRVAL(db.Model):
                 'value': self.m_value,
                 'kbid': self.kb.id if self.kb else None,
                 'kbname': self.kb.name if self.kb else None}
+
+
+Index('ix_knwKBRVAL_m_value', KnwKBRVAL.m_value, mysql_length=30)
 
 __all__ = ('KnwKB', 'KnwKBDDEF', 'KnwKBRVAL')

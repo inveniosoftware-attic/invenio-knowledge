@@ -59,7 +59,8 @@ def load(name, filepath, separator="---"):
     current_app.logger.info(
         ">>> Going to load knowledge base {0} into '{1}'...".format(
             filepath, name
-        ))
+        )
+    )
     if not os.path.isfile(filepath):
         current_app.logger.error(
             "Path to non-existing file\n",

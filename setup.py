@@ -1,21 +1,26 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio
-# Copyright (C) 2015 CERN
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
 #
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
+# Invenio is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
+# Invenio is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation,
-# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# along with Invenio; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Invenio module for knowledge base management."""
 
@@ -29,23 +34,23 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
-    'Flask',
-    'six',
-    'Invenio',
+    'Flask>=0.10.1',
+    'six>=1.7.2',
+    'invenio-collections>=0.1.0',
+    'invenio-upgrader>=0.1.0',
 ]
 
 test_requirements = [
-    'pytest',
-    'pytest-cov',
-    'pytest-pep8',
-    'coverage',
-    'coveralls',
-    'flask_testing',
+    'unittest2>=1.1.0',
+    'Flask_Testing>=0.4.1',
+    'pytest>=2.7.0',
+    'pytest-cov>=1.8.0',
+    'pytest-pep8>=1.0.6',
+    'coverage>=3.7.1',
 ]
 
 
 class PyTest(TestCommand):
-
     """PyTest Test."""
 
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
@@ -78,21 +83,21 @@ class PyTest(TestCommand):
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 
-# Get the version string.  Cannot be done with import!
+# Get the version string. Cannot be done with import!
 g = {}
-with open(os.path.join("invenio_knowledge", "version.py"), "rt") as fp:
+with open(os.path.join('invenio_knowledge', 'version.py'), 'rt') as fp:
     exec(fp.read(), g)
-    version = g["__version__"]
+    version = g['__version__']
 
 setup(
     name='invenio-knowledge',
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,
-    keywords='invenio knowledge',
+    keywords='invenio TODO',
     license='GPLv2',
-    author='Invenio collaboration',
-    author_email='info@inveniosoftware.org',
+    author='CERN',
+    author_email='info@invenio-software.org',
     url='https://github.com/inveniosoftware/invenio-knowledge',
     packages=[
         'invenio_knowledge',
@@ -103,10 +108,10 @@ setup(
     install_requires=requirements,
     extras_require={
         'docs': [
-            'Sphinx',
-            'sphinx_rtd_theme'
+            'Sphinx>=1.3',
+            'sphinx_rtd_theme>=0.1.7'
         ],
-        'test': test_requirements
+        'tests': test_requirements
     },
     classifiers=[
         'Environment :: Web Environment',
@@ -115,13 +120,14 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules'
-        "Programming Language :: Python :: 2",
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python :: 2',
         # 'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         # 'Programming Language :: Python :: 3',
         # 'Programming Language :: Python :: 3.3',
         # 'Programming Language :: Python :: 3.4',
+        'Development Status :: 1 - Planning',
     ],
     tests_require=test_requirements,
     cmdclass={'test': PyTest},

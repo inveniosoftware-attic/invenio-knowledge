@@ -1,0 +1,76 @@
+# German translations for invenio-knowledge.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the invenio-knowledge
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: invenio-knowledge 0.1.0.dev20150422\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-08-20 15:59+0200\n"
+"PO-Revision-Date: 2015-08-20 15:59+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+#: invenio_knowledge/admin.py:154
+#, python-format
+msgid "Already uploaded %(name)s"
+msgstr ""
+
+#: invenio_knowledge/api.py:355
+#, python-format
+msgid ""
+"Can't create knowledge base \"%(name)s\".\n"
+"Probabily the server is busy! Try again later."
+msgstr ""
+
+#: invenio_knowledge/forms.py:41
+msgid "Knowledge"
+msgstr ""
+
+#: invenio_knowledge/forms.py:74
+msgid "-None-"
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:24
+msgid "List"
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:28
+msgid "Create new record \"Taxonomy\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:28
+msgid "Create KB \"Taxonomy\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:31
+msgid "Create new record \"Dynamic\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:31
+msgid "Create KB \"Dynamic\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:34
+msgid "Create new record \"Written As\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:34
+msgid "Create KB \"Writtes As\""
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:61
+msgid "Edit record"
+msgstr ""
+
+#: invenio_knowledge/templates/knowledge/list.html:70
+msgid "Are you sure you want to delete this record?"
+msgstr ""
+

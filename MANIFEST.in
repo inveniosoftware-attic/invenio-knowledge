@@ -19,15 +19,20 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-include LICENSE
-include tox.ini
-include docs/*.rst docs/Makefile
-include *.rst
-include tests/*.ini tests/*.py
-include .coveragerc .travis.yml pytest.ini
 include *.py *.sh *.txt
+include *.rst
+include .coveragerc .travis.yml pytest.ini
+include .dockerignore .editorconfig
+include LICENSE
+include babel.ini
+include docs/*.rst docs/Makefile
+include tests/*.ini tests/*.py
+include tox.ini
+recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include invenio_knowledge *.css
 recursive-include invenio_knowledge *.html
 recursive-include invenio_knowledge *.js
+recursive-include invenio_knowledge *.po
+recursive-include invenio_knowledge *.pot
 recursive-include invenio_knowledge *.py

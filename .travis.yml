@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio.
-# Copyright (C) 2015 CERN.
+# This file is part of Invenio
+# Copyright (C) 2015 CERN
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,11 +14,18 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# along with Invenio; if not, write to the Free Software Foundation,
+# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
+
 
 notifications:
   email: false
+
+sudo: false
 
 services:
   - mysql
@@ -30,24 +37,43 @@ cache:
   - apt
   - pip
 
+env:
+  - REQUIREMENTS=lowest REXTRAS=docs,tests
+  - REQUIREMENTS=release REXTRAS=docs,tests
+  - REQUIREMENTS=devel REXTRAS=docs,tests
+
 python:
   - "2.7"
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install python-dev
+  - "travis_retry pip install --upgrade pip"
+  - "travis_retry pip install mock twine wheel"
+  - "python requirements.py --extras=$REXTRAS --level=min > .travis-lowest-requirements.txt"
+  - "python requirements.py --extras=$REXTRAS --level=pypi > .travis-release-requirements.txt"
+  - "python requirements.py --extras=$REXTRAS --level=dev > .travis-devel-requirements.txt"
 
 install:
-  - travis_retry pip install -r requirements.txt
-  - travis_retry pip install -e .[docs,test]
+  - "travis_retry pip install -e git+https://github.com/inveniosoftware/invenio#egg=invenio"
+  - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external"
+  - "travis_retry pip install -e .[$REXTRAS]"
 
 before_script:
-    - inveniomanage database init --yes-i-know || echo ':('
-    - inveniomanage database create --quiet || echo ':('
+  - "inveniomanage database init --yes-i-know || echo ':('"
+  - "inveniomanage database create --quiet || echo ':('"
 
 script:
-  - sphinx-build -qnNW docs docs/_build/html
-  - python setup.py test
+  - "sphinx-build -qnN docs docs/_build/html"
+  - "python setup.py test"
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: jirikuncar
+  password:
+    secure: V6OOzYa3q41pDKBLoSYhe14itH0pnDKck3P8agIGQ/2k3hcseTDZg63KCGROChO15ibEQEDEu5qLwUuINesZg3ennS4fNWgMspaCl7+1ZgbW3ROmN9gWD5uJHrsQECF5JCAVRpZUiN+F1zJPDtvOFpSQt968FS4+RUrfFHyxSiY=
+  distributions: "compile_catalog sdist bdist_wheel"
+  on:
+    tags: true
+    python: "2.7"

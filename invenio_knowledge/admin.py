@@ -26,7 +26,6 @@ from flask import request
 from invenio.base.i18n import _
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
-from invenio.modules.collections.models import Collection
 
 from .forms import DynamicKnowledgeForm, KnowledgeForm, KnwKBRVALForm, \
     TaxonomyKnowledgeForm, WrittenAsKnowledgeForm
@@ -105,6 +104,7 @@ class KnowledgeAdmin(ModelView):
     def after_model_change(self, form, model, is_created):
         """Save model."""
         super(KnowledgeAdmin, self).after_model_change(form, model, is_created)
+        from invenio_collections.models import Collection
 
         if form.kbtype.data == KnwKB.KNWKB_TYPES['dynamic']:
             id_collection = form.id_collection.data or None
@@ -188,6 +188,7 @@ class KnowledgeAdmin(ModelView):
 def register_admin(app, admin):
     """Called on app initialization to register administration interface."""
     category = 'Knowledge'
+    admin.category_icon_classes[category] = "fa fa-mortar-board"
     admin.add_view(
         KnowledgeAdmin(app, KnwKB, db.session,
                        name='Knowledge Base', category=category,

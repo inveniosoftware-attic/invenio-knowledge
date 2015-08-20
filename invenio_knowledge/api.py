@@ -21,14 +21,13 @@
 
 import json
 import os
-import re
 import warnings
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.collections.models import Collection
+from invenio_collections.models import Collection
 from invenio.utils.memoise import Memoise
 
 from sqlalchemy.exc import IntegrityError
@@ -404,66 +403,6 @@ def delete_kb(kb_name):
     db.session.delete(models.KnwKB.query.filter_by(
         name=kb_name).one())
 
-
-# Knowledge Bases Dependencies
-#
-
-
-def get_elements_that_use_kb(name):
-    """Return a list of elements that call given kb.
-
-    WARNING: this routine is obsolete.
-
-    .. code-block:: python
-
-        [
-         {
-          'filename':"filename_1.py",
-          'name': "a name"
-         },
-         ..
-        ]
-
-    :return: elements sorted by name
-    """
-    # FIXME remove the obsolete function
-    warnings.warn("The method 'get_elements_that_use_kb(name) is obsolete!'",
-                  DeprecationWarning)
-
-    format_elements = {}
-    # Retrieve all elements in files
-    from invenio.modules.formatter.engine \
-        import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
-    for element in TEMPLATE_CONTEXT_FUNCTIONS_CACHE \
-            .bibformat_elements().values():
-        path = element.__file__
-        filename = os.path.basename(element.__file__)
-        if filename.endswith(".py"):
-            formatf = open(path, 'r')
-            code = formatf.read()
-            formatf.close()
-            # Search for use of kb inside code
-            kb_pattern = re.compile('''
-            (bfo.kb)\s*                #Function call
-            \(\s*                      #Opening parenthesis
-            [\'"]+                     #Single or double quote
-            (?P<kb>%s)                 #kb
-            [\'"]+\s*                  #Single or double quote
-            ,                          #comma
-            ''' % name, re.VERBOSE | re.MULTILINE | re.IGNORECASE)
-
-            result = kb_pattern.search(code)
-            if result is not None:
-                name = ("".join(filename.split(".")[:-1])).lower()
-                if name.startswith("bfe_"):
-                    name = name[4:]
-                format_elements[name] = {'filename': filename,
-                                         'name': name}
-
-    keys = format_elements.keys()
-    keys.sort()
-    return map(format_elements.get, keys)
-
 # kb functions for export
 
 
@@ -595,7 +534,7 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     :param searchwith: a term to search with
     :return: list of values
     """
-    from invenio.legacy import search_engine
+    from invenio_search.api import Query
 
     # get the configuration so that we see what the field is
     if not confdict:
@@ -607,33 +546,35 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     collection = ""
     if 'collection' in confdict:
         collection = confdict['collection']
-    reclist = []  # return this
     if searchwith and expression:
         if (expression.count('%') > 0):
             expression = expression.replace("%", searchwith)
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
         else:
             # no %.. just make a combination
             expression = expression + " and " + searchwith
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
     else:  # either no expr or no searchwith.. but never mind about searchwith
         if expression:  # in this case: only expression
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
         else:
             # make a fake expression so that only records that have this field
             # will be returned
             fake_exp = "/.*/"
             if searchwith:
                 fake_exp = searchwith
-            reclist = search_engine.perform_request_search(f=field, p=fake_exp,
-                                                           cc=collection)
-    if reclist:
-        return [val for (val, dummy) in
-                search_engine.get_most_popular_field_values(reclist, field)]
-    return []  # in case nothing worked
+            response = Query("{0}:{1}".format(field, fake_exp)).search(
+                collection=collection
+            )
+
+    # TODO wait for new search API for pagination
+    response.body["size"] = 9999999
+    values = []
+    for record in response.records():
+        value = record.get(field)
+        if value:
+            values.append(value)
+    return values
 
 
 def get_kbd_values_json(kbname, searchwith=""):
@@ -646,33 +587,6 @@ def get_kbd_values_json(kbname, searchwith=""):
     """
     res = get_kbd_values(kbname, searchwith)
     return json.dumps(res)
-
-
-def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
-                               expression=""):
-    """Get list of kbd values for bibedit.
-
-    Example1: tag=100__a : return values of 100__a
-    Example2: tag=100__a, searchwith=Jill: return values of 100__a that match
-    with Jill
-    Example3: tag=100__a, searchwith=Ellis, expression="700__a:*%*:
-    return values of 100__a for which Ellis matches some 700__a
-
-    Note: the performace of this function is ok compared to a plain
-          perform_request_search / get most popular fields -pair.
-          The overhead is about 5% with large record sets;
-          the lookups are the xpensive part.
-
-    :param tag:        the tag like 100__a
-    :param collection: collection id
-    :param searchwith: the string to search. If empty, match all.
-    :param expression: the search expression for perform_request_search;
-                       if present, '%' is substituted with /searcwith/.
-                       If absent, /searchwith/ is searched for in /tag/.
-    """
-    return get_kbd_values_by_def(dict(
-        field=tag, expression=expression, collection=collection
-    ), searchwith)
 
 
 def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
@@ -722,94 +636,6 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
                 if len(line) > 0:
                     ritems.append(line)
 
-    return ritems
-
-
-def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
-    """A simplifield, customized version of the function get_kbt_items.
-
-    Traverses an RDF document. By default returns all leaves. If
-    tag defined returns the content of that tag.
-    If searchwith defined, returns leaves that match it.
-    Warning! In order to make this faster, the matching field values
-    cannot be multi-line!
-
-    :param kbtname: name of the taxonony kb
-    :param tag: name of tag whose content
-    :param searchwith: a term to search with
-    """
-    # get the actual file based on the kbt name
-    kb = get_kb_by_name(kbtname)
-    kb_id = kb.id
-    if not kb_id:
-        return []
-    # get the rdf file..
-    rdfname = cfg['CFG_WEBDIR'] + "/kbfiles/" + str(kb_id) + ".rdf"
-    if not os.path.exists(rdfname):
-        return []
-
-    xsl = """\
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-
-  <xsl:output method="xml" standalone="yes"
-    omit-xml-declaration="yes" indent="no"/>
-  <xsl:template match="rdf:RDF">
-    <foo><!--just having some tag here speeds up output by 10x-->
-    <xsl:apply-templates />
-    </foo>
-  </xsl:template>
-
-  <xsl:template match="*">
-   <!--hi><xsl:value-of select="local-name()"/></hi-->
-   <xsl:if test="local-name()='"""+tag+"""'">
-     <myout><xsl:value-of select="normalize-space(.)"/></myout>
-   </xsl:if>
-   <!--traverse down in tree!-->
-<xsl:text>
-</xsl:text>
-   <xsl:apply-templates />
-  </xsl:template>
-
-</xsl:stylesheet>"""
-
-    if processor_type == 1:
-        styledoc = etree.XML(xsl)
-        style = etree.XSLT(styledoc)
-        doc = etree.parse(open(rdfname, 'r'))
-        strres = str(style(doc))
-
-    elif processor_type == 2:
-        styledoc = libxml2.parseDoc(xsl)
-        style = libxslt.parseStylesheetDoc(styledoc)
-        doc = libxml2.parseFile(rdfname)
-        result = style.applyStylesheet(doc, None)
-        strres = style.saveResultToString(result)
-        style.freeStylesheet()
-        doc.freeDoc()
-        result.freeDoc()
-
-    else:
-        # no xml parser found
-        strres = ""
-
-    ritems = []
-    if len(strres) == 0:
-        return []
-    else:
-        lines = strres.split("\n")
-        for line in lines:
-            # take only those with myout..
-            if line.count("<myout>") > 0:
-                # remove the myout tag..
-                line = line[9:]
-                line = line[:-8]
-                if searchwith:
-                    if line.count(searchwith) > 0:
-                        ritems.append(line)
-                else:
-                    ritems.append(line)
     return ritems
 
 

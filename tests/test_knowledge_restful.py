@@ -36,7 +36,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
     @session_manager
     def setUp(self):
         """Run before each test."""
-        from invenio.modules.knowledge.models import KnwKB, KnwKBRVAL
+        from invenio_knowledge.models import KnwKB, KnwKBRVAL
 
         self.kb_a = KnwKB(name='example1', description='test description',
                           kbtype='w')
@@ -94,7 +94,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
     @session_manager
     def tearDown(self):
         """Run after every test."""
-        from invenio.modules.knowledge.models import KnwKB
+        from invenio_knowledge.models import KnwKB
 
         db.session.delete(KnwKB.query.filter_by(id=self.kb_a.id).one())
         db.session.delete(KnwKB.query.filter_by(id=self.kb_b.id).one())
@@ -172,13 +172,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
             user_id=1,
         )
 
-        answer = get_answer.json
-
-        expected_result = dict(
-            status=404,
-        )
-
-        assert answer['status'] == expected_result['status']
+        assert get_answer.status_code == 404
 
     def test_get_knwkb_mappings(self):
         """Test the return of list of mappings."""
