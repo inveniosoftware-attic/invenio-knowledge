@@ -23,8 +23,8 @@ import json
 import os
 import warnings
 
-from invenio.base.globals import cfg
-from invenio.base.i18n import _
+from invenio_base.globals import cfg
+from invenio_base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio_collections.models import Collection

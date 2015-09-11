@@ -19,7 +19,7 @@
 
 """Knowledge Forms."""
 
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 from invenio.utils.forms import InvenioBaseForm
 
 from werkzeug.local import LocalProxy

@@ -21,7 +21,7 @@
 
 import os
 
-from invenio.base.globals import cfg
+from invenio_base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio_collections.models import Collection

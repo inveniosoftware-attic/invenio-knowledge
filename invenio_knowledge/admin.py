@@ -23,7 +23,7 @@ import os
 
 from flask import request
 
-from invenio.base.i18n import _
+from invenio_base.i18n import _
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
 

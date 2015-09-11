@@ -21,7 +21,7 @@
 
 from __future__ import print_function
 
-from invenio.base.wrappers import lazy_import
+from invenio_base.wrappers import lazy_import
 from invenio.ext.restful.utils import APITestCase
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.testsuite import make_test_suite, run_test_suite
