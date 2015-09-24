@@ -22,11 +22,11 @@
 from __future__ import print_function
 
 from invenio_base.wrappers import lazy_import
+
 from invenio_ext.restful.utils import APITestCase
 from invenio_ext.sqlalchemy.utils import session_manager
-from invenio.testsuite import make_test_suite, run_test_suite
 
-db = lazy_import('invenio.ext.sqlalchemy.db')
+db = lazy_import('invenio_ext.sqlalchemy.db')
 
 
 class TestKnowledgeRestfulAPI(APITestCase):
@@ -292,8 +292,3 @@ class TestKnowledgeRestfulAPI(APITestCase):
                 user_id=1,
                 code=405,
             )
-
-TEST_SUITE = make_test_suite(TestKnowledgeRestfulAPI)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)

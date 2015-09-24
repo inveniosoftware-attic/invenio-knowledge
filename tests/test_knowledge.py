@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2009, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@
 
 """Unit tests for BibKnowledge."""
 
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio_testing import InvenioTestCase
 
 
 class BibknowledgeTests(InvenioTestCase):
@@ -33,10 +33,3 @@ class BibknowledgeTests(InvenioTestCase):
     def tearDown(self):
         """bbibknowledge unit test cleanup"""
         pass
-
-
-TEST_SUITE = make_test_suite(BibknowledgeTests)
-
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
