@@ -19,7 +19,7 @@
 
 """Add is_api_accessible and slug in the knwKB table."""
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql
 from invenio_upgrader.api import op
 from invenio_utils.text import slugify

@@ -23,7 +23,7 @@ from functools import wraps
 
 from flask_restful import Resource, abort, fields, marshal_with, reqparse
 
-from invenio.ext.restful import pagination
+from invenio_ext.restful import pagination
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
