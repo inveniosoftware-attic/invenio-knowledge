@@ -19,9 +19,9 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-include *.py *.sh *.txt
+include *.py *.sh *.txt *.ini
 include *.rst
-include .coveragerc .travis.yml pytest.ini
+include .coveragerc .travis.yml .travis.invenio.cfg
 include .dockerignore .editorconfig
 include LICENSE
 include babel.ini
