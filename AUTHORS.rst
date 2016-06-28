@@ -24,10 +24,10 @@ Authors
 =======
 
 Invenio Knowledge is a module developed for the `Invenio
-<http://invenio-software.org>`_ digital library software.
+<http://inveniosoftware.org>`_ digital library software.
 
-Contact us at `info@invenio-software.org
-<mailto:info@invenio-software.org>`_.
+Contact us at `info@inveniosoftware.org
+<mailto:info@inveniosoftware.org>`_.
 
 - Benoit Thiell <bthiell@cfa.harvard.edu>
 - Christopher Dickinson <christopher.dickinson@cern.ch>
