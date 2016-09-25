@@ -46,4 +46,4 @@ Invenio module for knowledge base management.
 *This is an experimental development preview release.*
 
 * Free software: GPLv2 license
-* Documentation: https://invenio-knowledge.readthedocs.org.
+* Documentation: https://invenio-knowledge.readthedocs.io.

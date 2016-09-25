@@ -25,6 +25,7 @@ include .coveragerc .travis.yml .travis.invenio.cfg
 include .dockerignore .editorconfig
 include LICENSE
 include babel.ini
+include docs/requirements.txt
 include docs/*.rst docs/Makefile
 include tests/*.ini tests/*.py
 include tox.ini

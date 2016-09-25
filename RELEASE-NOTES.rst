@@ -34,7 +34,7 @@ Installation
 Documentation
 -------------
 
-   http://invenio-knowledge.readthedocs.org/en/v0.1.1
+   http://invenio-knowledge.readthedocs.io/en/v0.1.1
 
 Happy hacking and thanks for flying Invenio-Knowledge.
 
