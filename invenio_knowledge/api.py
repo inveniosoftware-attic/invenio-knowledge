@@ -20,13 +20,9 @@
 """Provide API-callable functions for knowledge base management."""
 
 import json
-import os
 import warnings
 
-from invenio_base.globals import cfg
-from invenio_base.i18n import _
-from invenio_ext.sqlalchemy import db
-from invenio_ext.sqlalchemy.utils import session_manager
+from invenio_db import db
 from invenio_collections.models import Collection
 from invenio_utils.memoise import Memoise
 
@@ -187,7 +183,6 @@ def get_kb_mapping(kb_name="", key="", value="", match_type="e", default="",
         return mappings[0]
 
 
-@session_manager
 def add_kb_mapping(kb_name, key, value=""):
     """Add a new mapping to given kb.
 
@@ -195,27 +190,36 @@ def add_kb_mapping(kb_name, key, value=""):
     :param key: the key of the mapping
     :param value: the value of the mapping
     """
-    kb = get_kb_by_name(kb_name)
-    if key in kb.kbrvals:
-        # update
-        kb.kbrvals[key].m_value = value
-    else:
-        # insert
-        kb.kbrvals.set(models.KnwKBRVAL(m_key=key, m_value=value))
+    try:
+        kb = get_kb_by_name(kb_name)
+        if key in kb.kbrvals:
+            # update
+            kb.kbrvals[key].m_value = value
+        else:
+            # insert
+            kb.kbrvals.set(models.KnwKBRVAL(m_key=key, m_value=value))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
-@session_manager
 def remove_kb_mapping(kb_name, key):
     """Delete an existing kb mapping in kb.
 
     :param kb_name: the name of the kb where to insert the new value
     :param key: the key of the mapping
     """
-    kb = get_kb_by_name(kb_name)
-    del kb.kbrvals[key]
+
+    try:
+        kb = get_kb_by_name(kb_name)
+        del kb.kbrvals[key]
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
-@session_manager
 def update_kb_mapping(kb_name, old_key, key, value):
     """Update an existing kb mapping with key old_key with a new key and value.
 
@@ -224,10 +228,16 @@ def update_kb_mapping(kb_name, old_key, key, value):
     :param key: the new key of the mapping
     :param value: the new value of the mapping
     """
-    db.session.query(models.KnwKBRVAL).join(models.KnwKB) \
-        .filter(models.KnwKB.name == kb_name,
-                models.KnwKBRVAL.m_key == old_key) \
-        .update({"m_key": key, "m_value": value}, synchronize_session=False)
+    try:
+        db.session.query(models.KnwKBRVAL).join(models.KnwKB) \
+            .filter(models.KnwKB.name == kb_name,
+                    models.KnwKBRVAL.m_key == old_key) \
+            .update(
+                {"m_key": key, "m_value": value}, synchronize_session=False)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def get_kb_mappings_json(kb_name="", key="", value="", match_type="s",
@@ -300,7 +310,6 @@ def get_kb_name(kb_id):
     return get_kb_by_id(kb_id).name
 
 
-@session_manager
 def update_kb_attributes(kb_name, new_name, new_description=''):
     """Update kb kb_name with a new name and (optionally) description.
 
@@ -308,8 +317,14 @@ def update_kb_attributes(kb_name, new_name, new_description=''):
     :param new_name: the new name for the kb
     :param new_description: the new description for the kb
     """
-    models.KnwKB.query.filter_by(name=kb_name) \
-        .update({"name": new_name, "description": new_description})
+
+    try:
+        models.KnwKB.query.filter_by(name=kb_name) \
+            .update({"name": new_name, "description": new_description})
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 
 def add_kb(kb_name=u"Untitled", kb_type=None, tries=10):
@@ -394,14 +409,18 @@ def kb_mapping_exists(kb_name, key):
     return key in kb.kbrvals
 
 
-@session_manager
 def delete_kb(kb_name):
     """Delete given kb from database.
 
     :param kb_name: knowledge base name
     """
-    db.session.delete(models.KnwKB.query.filter_by(
-        name=kb_name).one())
+    try:
+        db.session.delete(models.KnwKB.query.filter_by(
+            name=kb_name).one())
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
 
 # kb functions for export
 

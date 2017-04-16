@@ -21,16 +21,17 @@
 
 import os
 
-from invenio_base.globals import cfg
-from invenio_ext.sqlalchemy import db
-from invenio_ext.sqlalchemy.utils import session_manager
+from invenio_db import db
 from invenio_collections.models import Collection
 from invenio_utils.text import slugify
 
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.schema import Index
+
+from flask import current_app
 
 
 class KnwKB(db.Model):
@@ -44,18 +45,18 @@ class KnwKB(db.Model):
     }
 
     __tablename__ = 'knwKB'
-    id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
+    id = db.Column(db.Integer, nullable=False,
                    primary_key=True, autoincrement=True)
     _name = db.Column(db.String(255), server_default='',
                       unique=True, name="name")
     _description = db.Column(db.Text, nullable=False,
                              name="description", default="")
-    _kbtype = db.Column(db.Char(1), nullable=True, default='w', name="kbtype")
+    _kbtype = db.Column(db.Text, nullable=True, default='w', name="kbtype")
     slug = db.Column(db.String(255), unique=True, nullable=False, default="")
     # Enable or disable the access from REST API
     is_api_accessible = db.Column(db.Boolean, default=True, nullable=False)
 
-    @db.hybrid_property
+    @hybrid_property
     def name(self):
         """Get name."""
         return self._name
@@ -68,7 +69,7 @@ class KnwKB(db.Model):
         if not self.slug:
             self.slug = KnwKB.generate_slug(value)
 
-    @db.hybrid_property
+    @hybrid_property
     def description(self):
         """Get description."""
         return self._description
@@ -80,7 +81,7 @@ class KnwKB(db.Model):
         # @see http://bugs.mysql.com/bug.php?id=21532
         self._description = value or ''
 
-    @db.hybrid_property
+    @hybrid_property
     def kbtype(self):
         """Get kbtype."""
         return self._kbtype
@@ -176,20 +177,24 @@ class KnwKB(db.Model):
                               KnwKBRVAL.m_value.like(searchvalue),
                               KnwKBRVAL.m_key.like(searchkey))))
 
-    @session_manager
     def set_dyn_config(self, field, expression, collection=None):
         """Set dynamic configuration."""
-        if self.kbdefs:
-            # update
-            self.kbdefs.output_tag = field
-            self.kbdefs.search_expression = expression
-            self.kbdefs.collection = collection
-            db.session.merge(self.kbdefs)
-        else:
-            # insert
-            self.kbdefs = KnwKBDDEF(output_tag=field,
-                                    search_expression=expression,
-                                    collection=collection)
+        try:
+            if self.kbdefs:
+                # update
+                self.kbdefs.output_tag = field
+                self.kbdefs.search_expression = expression
+                self.kbdefs.collection = collection
+                db.session.merge(self.kbdefs)
+            else:
+                # insert
+                self.kbdefs = KnwKBDDEF(output_tag=field,
+                                        search_expression=expression,
+                                        collection=collection)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
 
     @staticmethod
     def generate_slug(name):
@@ -231,7 +236,7 @@ class KnwKB(db.Model):
 
     def get_filename(self):
         """Construct the file name for taxonomy knoledge."""
-        return cfg['CFG_WEBDIR'] + "/kbfiles/" \
+        return current_app.config['WEBDIR'] + "/kbfiles/" \
             + str(self.id) + ".rdf"
 
 
@@ -249,10 +254,10 @@ class KnwKBDDEF(db.Model):
     """Represent a KnwKBDDEF record."""
 
     __tablename__ = 'knwKBDDEF'
-    id_knwKB = db.Column(db.MediumInteger(8, unsigned=True),
+    id_knwKB = db.Column(db.Integer,
                          db.ForeignKey(KnwKB.id), nullable=False,
                          primary_key=True)
-    id_collection = db.Column(db.MediumInteger(unsigned=True),
+    id_collection = db.Column(db.Integer,
                               db.ForeignKey(Collection.id),
                               nullable=True)
     output_tag = db.Column(db.Text, nullable=True)
@@ -286,9 +291,7 @@ class KnwKBRVAL(db.Model):
         db.Text().with_variant(mysql.TEXT(30), 'mysql'),
         nullable=False)
     id_knwKB = db.Column(
-        db.MediumInteger(
-            8,
-            unsigned=True),
+        db.Integer,
         db.ForeignKey(
             KnwKB.id),
         nullable=False,
